@@ -1,13 +1,21 @@
 import * as t from 'io-ts'
 import { emailCodec, passwordCodec, slugCodec, urlCodec } from '@/core/types/scalar'
 
-export const userCodec = t.type({
+const userCodecRequired = t.type({
   email: emailCodec,
-  token: t.string,
   username: slugCodec,
+})
+
+const userCodecPartial = t.type({
+  token: t.string,
   bio: t.string,
   image: urlCodec,
 })
+
+export const userCodec = t.intersection([
+  userCodecRequired,
+  userCodecPartial,
+])
 
 export type User = t.TypeOf<typeof userCodec>
 
