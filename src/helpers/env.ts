@@ -1,22 +1,11 @@
-import * as t from 'io-ts'
-import { withMessage } from 'io-ts-types'
-import { failure } from 'io-ts/PathReporter'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-
-type LengthBrand = {
-  readonly NonEmptyString: unique symbol
-}
-
-const nonEmptyStringCodec = t.brand(
-  t.string,
-  (value): value is t.Branded<string, LengthBrand> => isNonEmptyString(value),
-  'NonEmptyString',
-)
+import { failure } from 'io-ts/PathReporter'
+import { withMessage, NonEmptyString } from 'io-ts-types'
 
 export const env = (value: string) => {
   const envCodec = withMessage(
-    nonEmptyStringCodec,
+    NonEmptyString,
     () => `You must set the env var ${value}`,
   )
 
@@ -27,8 +16,4 @@ export const env = (value: string) => {
       (value) => value,
     ),
   )
-}
-
-function isNonEmptyString (value: unknown) {
-  return typeof value === 'string' && value.length > 0
 }
