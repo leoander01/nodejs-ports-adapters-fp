@@ -10,6 +10,22 @@ import {
   addCommentToAnArticleInDB,
 } from '@/adapters/ports/db'
 import { env } from '@/helpers'
+import * as jose from 'jose'
+// import { SignJWT } from 'jose/jwt/sign'
+// import { generateKeyPair } from 'jose/util/generate_key_pair'
+
+async function createJWT () {
+  const secret = await jose.generateSecret('HS256')
+
+  const jwt = await new jose.SignJWT({ id: '123' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('10m')
+    .sign(secret)
+
+  console.log('jwt:', jwt)
+}
+
+createJWT()
 
 const app = express()
 
@@ -17,6 +33,9 @@ const PORT = env('PORT')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.disable('x-powered-by')
+app.disable('etag')
 
 // public
 app.post('/api/users', async (req: Request, res: Response) => {
