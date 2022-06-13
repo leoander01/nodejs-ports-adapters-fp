@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import { registerUser } from '@/adapters/use-cases/user/register-user-adapter'
@@ -10,22 +10,6 @@ import {
   addCommentToAnArticleInDB,
 } from '@/adapters/ports/db'
 import { env } from '@/helpers'
-import * as jose from 'jose'
-// import { SignJWT } from 'jose/jwt/sign'
-// import { generateKeyPair } from 'jose/util/generate_key_pair'
-
-async function createJWT () {
-  const secret = await jose.generateSecret('HS256')
-
-  const jwt = await new jose.SignJWT({ id: '123' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('10m')
-    .sign(secret)
-
-  console.log('jwt:', jwt)
-}
-
-createJWT()
 
 const app = express()
 
@@ -46,6 +30,10 @@ app.post('/api/users', async (req: Request, res: Response) => {
     TE.mapLeft(error => res.status(400).json(getError(error.message))),
   )()
 })
+
+// function auth (req: Request, res: Response, next: NextFunction) {
+//   res.json('parou')
+// }
 
 // private
 app.post('/api/articles', async (req: Request, res: Response) => {

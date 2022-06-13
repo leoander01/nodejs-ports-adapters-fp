@@ -2,11 +2,6 @@ import { pipe } from 'fp-ts/function'
 import { registerUser, OutsideRegisterUser } from './register-user'
 import { CreateUser } from '@/core/types/user'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
-import { Email, Password, Slug } from '@/core/types/scalar'
-
-const unsafeEmail = (value: unknown) => unsafe<Email>(value)
-const unsafePassword = (value: unknown) => unsafe<Password>(value)
-const unsafeSlug = (value: unknown) => unsafe<Slug>(value)
 
 const registerOk: OutsideRegisterUser<string> = async (data) => {
   return `Usuário ${data.username} cadastrado com sucesso!`
@@ -17,21 +12,21 @@ const registerFail: OutsideRegisterUser<never> = async () => {
 }
 
 const data: CreateUser = {
-  username: unsafeSlug('john'),
-  email: unsafeEmail('john@doe.com'),
-  password: unsafePassword('john123!'),
+  username: unsafe('john'),
+  email: unsafe('john@doe.com'),
+  password: unsafe('john123!'),
 }
 
 const dataWithWrongUsername: CreateUser = {
-  username: unsafeSlug('a'),
-  email: unsafeEmail('john@doe.com'),
-  password: unsafePassword('john123!'),
+  username: unsafe('a'),
+  email: unsafe('john@doe.com'),
+  password: unsafe('john123!'),
 }
 
 const dataWithWrongEmailAndPassword: CreateUser = {
-  username: unsafeSlug('john'),
-  email: unsafeEmail('john'),
-  password: unsafePassword('j'),
+  username: unsafe('john'),
+  email: unsafe('john'),
+  password: unsafe('j'),
 }
 
 it('Should register a user properly', async () => {
