@@ -1,5 +1,11 @@
 import * as jwt from '@/ports/jwt/jose'
 
-export const generateToken = (payload) => {
-  return jwt.createJWT(payload)
+type JWTPayload = {
+  [propName: string]: unknown
+}
+
+type ExpirationTime = string
+
+export const generateToken = (...args: [JWTPayload, ExpirationTime?]) => {
+  return jwt.createJWT(...args)
 }

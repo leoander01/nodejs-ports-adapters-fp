@@ -5,11 +5,19 @@ import * as jwt from '@/adapters/ports/jwt'
 import * as db from '@/ports/db-in-memory/db'
 
 export const createUserInDB: user.OutsideRegisterUser = async (data) => {
-  const token = await jwt.generateToken({ id: '2' })
-  return db.outsideRegisterUser({
-    ...data,
-    token,
-  })
+  const registeredUser = await db.outsideRegisterUser(data)
+
+  const token = await jwt.generateToken({ id: registeredUser.id })
+
+  return {
+    user: {
+      username: registeredUser.username,
+      email: registeredUser.email,
+      bio: '',
+      image: undefined,
+      token,
+    },
+  }
 }
 
 export const createArticleInDB: article.OutsideRegisterArticle = (data) => {
