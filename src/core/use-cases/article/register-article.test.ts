@@ -2,35 +2,42 @@ import { pipe } from 'fp-ts/function'
 import { CreateArticle } from '@/core/types/article'
 import { registerArticle, OutsideRegisterArticle } from './register-article'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
-import { Slug } from '@/core/types/scalar'
-
-const unsafeSlug = (value: unknown) => unsafe<Slug>(value)
-const unsafeString = (value: unknown) => unsafe<string>(value)
 
 const data: CreateArticle = {
   title: 'Article title',
   body: 'Article body',
   description: 'Article description',
+  authorId: unsafe('ccaacb3c-c076-4d75-830a-a094d11589f3'),
 }
 
 const dataWithTagList: CreateArticle = {
   title: 'Article title 2',
   body: 'Article body 2',
   description: 'Article description 2',
-  tagList: [unsafeSlug('tag1'), unsafeSlug('tag2')],
+  tagList: [unsafe('tag1'), unsafe('tag2')],
+  authorId: unsafe('ccaacb3c-c076-4d75-830a-a094d11589f3'),
 }
 
 const dataWithInvalidTagList: CreateArticle = {
   title: 'Article title 3',
   body: 'Article body 3',
   description: 'Article description 3',
-  tagList: [unsafeSlug('taG1'), unsafeSlug('3ag2')],
+  tagList: [unsafe('taG1'), unsafe('3ag2')],
+  authorId: unsafe('ccaacb3c-c076-4d75-830a-a094d11589f3'),
 }
 
 const dataWithInvalidTitle: CreateArticle = {
-  title: unsafeString(1),
+  title: unsafe(1),
   body: 'Article body 3',
   description: 'Article description 3',
+  authorId: unsafe('ccaacb3c-c076-4d75-830a-a094d11589f3'),
+}
+
+const dataWithInvalidAuthorID: CreateArticle = {
+  title: 'Article title',
+  body: 'Article body',
+  description: 'Article description',
+  authorId: unsafe('123'),
 }
 
 const registerOk: OutsideRegisterArticle<string> = async (data: CreateArticle) => {
@@ -72,6 +79,14 @@ it('Should not accept article register if title is invalid', async () => {
     dataWithInvalidTitle,
     registerArticle(registerOk),
     mapAll(result => expect(result).toEqual(new Error('Invalid title'))),
+  )()
+})
+
+it('Should not accept article register if author ID is invalid', async () => {
+  return pipe(
+    dataWithInvalidAuthorID,
+    registerArticle(registerOk),
+    mapAll(result => expect(result).toEqual(new Error('Invalid author ID'))),
   )()
 })
 

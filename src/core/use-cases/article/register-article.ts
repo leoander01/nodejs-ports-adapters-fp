@@ -14,7 +14,7 @@ export const registerArticle: RegisterArticle = (outsideRegister) => (data) => {
     data,
     validateArticle,
     TE.fromEither,
-    TE.chain((data) => TE.tryCatch(
+    TE.chain(() => TE.tryCatch(
       () => outsideRegister(data),
       E.toError,
     )),
