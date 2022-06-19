@@ -4,9 +4,9 @@ import * as TE from 'fp-ts/TaskEither'
 import { CreateArticle } from '@/core/types/article'
 import { validateArticle } from './validate-article'
 
-export type OutsideRegisterArticle<A> = (data: CreateArticle) => Promise<A>
+export type OutsideRegister<A> = (data: CreateArticle) => Promise<A>
 
-export type RegisterArticle = <A>(outsideRegister: OutsideRegisterArticle<A>) =>
+export type RegisterArticle = <A>(outsideRegister: OutsideRegister<A>) =>
   (data: CreateArticle) => TE.TaskEither<Error, A>
 
 export const registerArticle: RegisterArticle = (outsideRegister) => (data) => {

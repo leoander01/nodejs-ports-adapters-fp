@@ -6,7 +6,7 @@ const userCodecRequired = t.type({
   username: slugCodec,
 })
 
-const userCodecPartial = t.type({
+const userCodecPartial = t.partial({
   token: t.string,
   bio: t.string,
   image: urlCodec,

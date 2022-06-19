@@ -3,7 +3,7 @@ import * as article from '@/adapters/use-cases/article/register-article-adapter'
 import * as comment from '@/adapters/use-cases/article/add-comment-to-an-article-adapter'
 import * as jwt from '@/adapters/ports/jwt'
 
-import * as db from '@/ports/db-in-memory/'
+import { database as db } from './db'
 
 export const createUserInDB: user.OutsideRegisterUser = async (data) => {
   const registeredUser = await db.createUserInDB(data)
@@ -34,6 +34,14 @@ export const createArticleInDB: article.OutsideRegisterArticle = async (data) =>
   }
 }
 
-export const addCommentToAnArticleInDB: comment.OutsideCreateComment = (data) => {
-  return db.outsideCreateComment(data)
+export const addCommentToAnArticleInDB: comment.OutsideCreateComment = async (data) => {
+  const registeredComment = await db.addCommentToAnArticleInDB(data)
+  const { authorId, articleId, ...comment } = registeredComment.comment
+
+  return {
+    comment: {
+      ...comment,
+      author: registeredComment.author,
+    },
+  }
 }
