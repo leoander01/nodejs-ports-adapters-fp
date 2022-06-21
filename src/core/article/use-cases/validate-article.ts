@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 import { failure } from 'io-ts/PathReporter'
-import { CreateArticle, createArticleCodec } from '@/core/types/article'
+import { CreateArticle, createArticleCodec } from '@/core/article/types'
 
 type ValidateArticle = (data: CreateArticle) => E.Either<Error, CreateArticle>
 

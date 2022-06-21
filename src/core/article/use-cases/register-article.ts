@@ -1,12 +1,12 @@
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
-import { CreateArticle } from '@/core/types/article'
+import { CreateArticle } from '@/core/article/types'
 import { validateArticle } from './validate-article'
 
-export type OutsideRegister<A> = (data: CreateArticle) => Promise<A>
+export type OutsideRegisterArticle<A> = (data: CreateArticle) => Promise<A>
 
-export type RegisterArticle = <A>(outsideRegister: OutsideRegister<A>) =>
+export type RegisterArticle = <A>(outsideRegister: OutsideRegisterArticle<A>) =>
   (data: CreateArticle) => TE.TaskEither<Error, A>
 
 export const registerArticle: RegisterArticle = (outsideRegister) => (data) => {

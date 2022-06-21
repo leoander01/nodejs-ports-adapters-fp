@@ -1,5 +1,6 @@
 import express, { Request as ExpressRequest, Response, NextFunction } from 'express'
 import { pipe } from 'fp-ts/function'
+import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { registerUser } from '@/adapters/use-cases/user/register-user-adapter'
 import { registerArticle } from '@/adapters/use-cases/article/register-article-adapter'
@@ -8,6 +9,7 @@ import {
   createUserInDB,
   createArticleInDB,
   addCommentToAnArticleInDB,
+  login,
 } from '@/adapters/ports/db'
 import { env } from '@/helpers'
 import { JWTPayload, verifyToken } from '@/adapters/ports/jwt'
@@ -32,6 +34,17 @@ app.post('/api/users', async (req: Request, res: Response) => {
     registerUser(createUserInDB),
     TE.map(result => res.json(result)),
     TE.mapLeft(error => res.status(400).json(getError(error.message))),
+  )()
+})
+
+app.post('/api/users/login', async (req: Request, res: Response) => {
+  return pipe(
+    TE.tryCatch(
+      () => login(req.body.user),
+      E.toError,
+    ),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(error => res.status(422).json(getError(error.message))),
   )()
 })
 

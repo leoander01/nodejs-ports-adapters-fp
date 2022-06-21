@@ -4,7 +4,7 @@ import {
   addCommentToAnArticle,
   OutsideCreateComment,
 } from './create-comment'
-import { CreateComment } from '@/core/types/comment'
+import { CreateComment } from '@/core/comment/types'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 
 const data: CreateComment = {

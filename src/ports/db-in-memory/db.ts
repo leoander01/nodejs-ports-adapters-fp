@@ -1,6 +1,6 @@
-import { UserOutput } from '@/core/types/user'
-import { ArticleOutput } from '@/core/types/article'
-import { CommentOutput } from '@/core/types/comment'
+import { UserOutput } from '@/core/user/types'
+import { ArticleOutput } from '@/core/article/types'
+import { CommentOutput } from '@/core/comment/types'
 
 export type DBUser = Omit<UserOutput, 'token'> & {
   id: string
@@ -18,9 +18,11 @@ export type DBComment = Omit<CommentOutput, 'author'> & {
 }
 
 type ArticleID = string
+type UserID = string
 
 type DB = {
   users: { [id: string]: DBUser }
+  usersByEmail: { [email: string]: UserID }
   articles: { [id: string]: DBArticle }
   articlesBySlug: { [slug: string]: ArticleID }
   comments: { [articleId: string]: DBComment[] }
@@ -28,6 +30,7 @@ type DB = {
 
 export const db: DB = {
   users: {},
+  usersByEmail: {},
   articles: {},
   articlesBySlug: {},
   comments: {},
