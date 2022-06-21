@@ -45,21 +45,31 @@ This project uses Hexagonal Architecture (Ports & Adapters) with Functional Prog
 ```terminal
 .
 ├── src
-│   ├── adapters
-│   ├── config
-│   │   ├── tests
-│   │   │   └── fixtures
-│   │   └── module-alias.ts
-│   ├── core
-│   │   ├── types
-│   │   └── use-cases
-│   ├── ports
-│   │   └── adapters
-│   ├── index.ts
-│   └── app.ts
-├── environment.d.ts
+│   ├── config
+│   │   ├── tests
+│   │   │   └── fixtures
+│   │   │       └── index.ts
+│   │   └── module-alias.ts
+│   ├── core
+│   │   ├── <domain / entity>
+│   │   │   ├── use-cases
+│   │   │   │   ├── <use-case>-adapter.ts
+│   │   │   │   ├── <use-case>.test.ts
+│   │   │   │   ├── <use-case>.ts
+│   │   │   └── types.ts
+│   │   └── types
+│   │       └── <type>.test.ts
+│   │       └── <type>.ts
+│   ├── helpers
+│   ├── ports
+│   │   ├── adapters
+│   │   │   └── <port-adapter>.ts
+│   │   ├── <port>
+│   ├── app.ts
+│   └── index.ts
+├── .env.example
 ├── jest.config.integration.js
-└── jest.config.js
+├── jest.config.js
 ```
 
 | Directory / File             | Description                                                                                                                    |

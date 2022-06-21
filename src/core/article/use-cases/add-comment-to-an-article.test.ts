@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function'
 import {
   addCommentToAnArticle,
   OutsideCreateComment,
-} from './create-comment'
+} from './add-comment-to-an-article'
 import { CreateComment } from '@/core/comment/types'
 import { mapAll, unsafe } from '@/config/tests/fixtures'
 

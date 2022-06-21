@@ -1,4 +1,4 @@
-import * as comment from '@/core/article/use-cases/create-comment'
+import * as comment from './add-comment-to-an-article'
 import { CommentOutput } from '@/core/comment/types'
 
 export type OutsideCreateComment = comment.OutsideCreateComment<{

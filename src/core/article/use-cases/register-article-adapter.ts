@@ -1,4 +1,4 @@
-import * as article from '@/core/article/use-cases/register-article'
+import * as article from './register-article'
 import { ArticleOutput } from '@/core/article/types'
 
 export type OutsideRegisterArticle = article.OutsideRegisterArticle<{ article: ArticleOutput }>
