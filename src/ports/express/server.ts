@@ -2,6 +2,7 @@ import express, { Request as ExpressRequest, Response, NextFunction } from 'expr
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
+import cors from 'cors'
 import { registerUser } from '@/core/user/use-cases/register-user-adapter'
 import { registerArticle } from '@/core/article/use-cases/register-article-adapter'
 import { addCommentToAnArticle } from '@/core/article/use-cases/add-comment-to-an-article-adapter'
@@ -27,6 +28,8 @@ app.use(express.urlencoded({ extended: true }))
 
 app.disable('x-powered-by')
 app.disable('etag')
+
+app.use(cors())
 
 app.post('/api/users', async (req: Request, res: Response) => {
   return pipe(
