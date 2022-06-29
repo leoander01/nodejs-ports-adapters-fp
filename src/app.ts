@@ -1,2 +1,1 @@
-import '@/ports/express/server'
-import '@/ports/jwt/jose'
+import '@/ports/adapters/http'
