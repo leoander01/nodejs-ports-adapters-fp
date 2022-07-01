@@ -7,6 +7,8 @@ if (JWT_SECRET.length < 32) {
   throw new Error('JWT_SECRET must be at least 32 chars long')
 }
 
+// export { jose.JWTPayload }
+
 export async function createJWT (
   payload: jose.JWTPayload,
   expirationTime: string = '10m',
