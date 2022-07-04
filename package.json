@@ -6,6 +6,9 @@
   "author": "Leoander Neves - @leoander01",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "start": "node dist/src/index.js",
     "dev": "nodemon --exec sucrase-node src/index.ts",
