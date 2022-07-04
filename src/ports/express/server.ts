@@ -4,9 +4,9 @@ import * as TE from 'fp-ts/TaskEither'
 import cors from 'cors'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
-import { getError, getToken } from '@/ports/adapters/http/http';
+import { getError, getToken } from '@/ports/adapters/http/http'
 import { env } from '@/helpers'
-import { JWTPayload, verifyToken } from '@/ports/adapters/jwt'
+import { JWTPayload } from '@/ports/adapters/jwt'
 
 type Request = ExpressRequest & {
   auth?: JWTPayload

@@ -7,7 +7,7 @@ import fastify, {
 } from 'fastify'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import { env } from '@/helpers/env'
+// import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, LoginUser } from '@/core/user/types'
 import { CreateArticle, AuthorId } from '@/core/article/types'
@@ -24,7 +24,7 @@ type CustomRequest = http.IncomingMessage & {
 
 const app = fastify<http.Server, CustomRequest>({ logger: true })
 
-const PORT = env('PORT')
+// const PORT = env('PORT')
 
 type ApiUsers = {
   Body:{

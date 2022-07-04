@@ -11,7 +11,7 @@ export function registerArticle (data: CreateArticle) {
   return pipe(
     data,
     article.registerArticle(db.createArticleInDB),
-    TE.mapLeft(error => getError({ errors: error.message, context: 'article' })),
+    TE.mapLeft(error => getError(error.message)),
   )
 }
 
@@ -19,6 +19,6 @@ export function addCommentToAnArticle (data: CreateComment) {
   return pipe(
     data,
     comment.addCommentToAnArticle(db.addCommentToAnArticleInDB),
-    TE.mapLeft(error => getError({ errors: error.message, context: 'comment' })),
+    TE.mapLeft(error => getError(error.message)),
   )
 }
