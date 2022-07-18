@@ -4,7 +4,9 @@ import * as E from 'fp-ts/Either'
 import { CreateUser, LoginUser } from '@/core/user/types'
 import * as user from '@/core/user/use-cases/register-user-adapter'
 import * as db from '@/ports/adapters/db'
-import { getError } from '@/ports/adapters/http/http'
+import { extractToken, getError } from '@/ports/adapters/http/http'
+import { JWTPayload } from '@/ports/adapters/jwt'
+import { AuthorId } from '@/core/article/types'
 
 export function registerUser (data: CreateUser) {
   return pipe(
@@ -20,6 +22,33 @@ export function login (data: LoginUser) {
       () => db.login(data),
       E.toError,
     ),
+    TE.mapLeft(error => getError(error.message)),
+  )
+}
+
+type GetCurrentUserInput = {
+  payload: JWTPayload
+  authHeader?: string
+}
+
+export function getCurrentUser ({ payload, authHeader }: GetCurrentUserInput) {
+  const propId = 'id'
+  const userId = payload[propId] as AuthorId
+
+  return pipe(
+    TE.tryCatch(
+      () => db.getCurrentUser(userId),
+      E.toError,
+    ),
+    TE.map(user => ({
+      user: {
+        email: user.email,
+        token: extractToken(authHeader),
+        username: user.username,
+        bio: user.bio ?? '',
+        image: user.image ?? '',
+      },
+    })),
     TE.mapLeft(error => getError(error.message)),
   )
 }

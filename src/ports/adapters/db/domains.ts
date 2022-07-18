@@ -7,6 +7,7 @@ import { LoginUser, UserOutput } from '@/core/user/types'
 import * as jwt from '@/ports/adapters/jwt'
 
 import { database as db } from './db'
+import { AuthorId } from '@/core/article/types'
 
 export const createUserInDB: user.OutsideRegisterUser = async (data) => {
   const registeredUser = await db.createUserInDB(data)
@@ -39,6 +40,16 @@ export const login: Login = async (data) => {
       token,
     },
   }
+}
+
+export const getCurrentUser = async (userId: AuthorId) => {
+  const user = await db.getCurrentUser(userId)
+
+  if (!user) {
+    throw new Error('User does not exist')
+  }
+
+  return user
 }
 
 export const createArticleInDB: article.OutsideRegisterArticle = async (data) => {

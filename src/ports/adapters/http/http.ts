@@ -10,7 +10,11 @@ export function getError (errors: string) {
   }
 }
 
-export async function getToken (authorizationHeader: string = '') {
-  const token = authorizationHeader.replace('Token ', '') ?? ''
- return verifyToken(token)
+export async function getToken (authHeader: string = '') {
+  const token = extractToken(authHeader)
+  return verifyToken(token)
+}
+
+export function extractToken (authHeader: string = '') {
+  return authHeader.replace('Token ', '')
 }
