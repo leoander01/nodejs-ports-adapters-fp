@@ -1,6 +1,6 @@
 import { verifyToken } from '@/ports/adapters/jwt'
 
-export * from '@/ports/fastify/server'
+export * from '@/ports/express/server'
 
 export function getError (errors: string) {
   return {
