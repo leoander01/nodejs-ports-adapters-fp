@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
-import { CreateUser,  LoginUser } from '@/core/user/types'
-import { DBUser, db } from './db'
+import { CreateUser, LoginUser } from '@/core/user/types'
+import { DBUser, dbInMemory as db } from './db'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
 

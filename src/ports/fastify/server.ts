@@ -73,13 +73,6 @@ const auth = <T>(
     }),
     TE.mapLeft(() => reply.code(401).send(getError('Unauthorized'))),
   )()
-  // try {
-  //   const payload = await getToken(req.headers.authorization)
-  //   req.raw.auth = payload
-  //   done()
-  // } catch {
-  //   reply.code(401).send(getError('Unauthorized'))
-  // }
 }
 
 type FastifyApiGetCurrentUser = RouteShorthandOptions<
