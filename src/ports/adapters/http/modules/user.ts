@@ -6,8 +6,6 @@ import * as jwt from '@/ports/adapters/jwt'
 import { extractToken, getError } from '@/ports/adapters/http/http'
 import { CreateUser, LoginUser, UserOutput } from '@/core/user/types'
 import * as user from '@/core/user/use-cases/register-user-adapter'
-import { JWTPayload } from '@/ports/adapters/jwt'
-import { AuthorId } from '@/core/article/types'
 
 export function registerUser (data: CreateUser) {
   return pipe(
@@ -44,13 +42,12 @@ export function login (data: LoginUser) {
 }
 
 type GetCurrentUserInput = {
-  payload: JWTPayload
+  payload: jwt.JWTPayloadInput
   authHeader?: string
 }
 
 export function getCurrentUser ({ payload, authHeader }: GetCurrentUserInput) {
-  const propId = 'id'
-  const userId = payload[propId] as AuthorId
+  const userId = payload.id
   const token = extractToken(authHeader)
 
   return pipe(

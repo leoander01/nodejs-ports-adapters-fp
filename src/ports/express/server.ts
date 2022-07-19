@@ -53,7 +53,7 @@ async function auth (req: Request, res: Response, next: NextFunction) {
 }
 
 app.get('/api/user', auth, async (req: Request, res: Response) => {
-  const payload = req.auth ?? {}
+  const payload = getPayload(req.auth)
 
   return pipe(
     user.getCurrentUser({
@@ -66,12 +66,11 @@ app.get('/api/user', auth, async (req: Request, res: Response) => {
 })
 
 app.post('/api/articles', auth, async (req: Request, res: Response) => {
-  const payload = req.auth ?? {}
-  const idProp = 'id'
+  const payload = getPayload(req.auth)
 
   const data = {
     ...req.body.article,
-    authorId: payload[idProp],
+    authorId: payload.id,
   }
 
   return pipe(
@@ -83,13 +82,12 @@ app.post('/api/articles', auth, async (req: Request, res: Response) => {
 })
 
 app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Response) => {
-  const payload = req.auth ?? {}
-  const idProp = 'id'
+  const payload = getPayload(req.auth)
   const slugProp = 'slug'
 
   const data = {
     ...req.body.comment,
-    authorId: payload[idProp],
+    authorId: payload.id,
     articleSlug: req.params[slugProp],
   }
 
@@ -100,6 +98,10 @@ app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Respons
     TE.mapLeft(error => res.status(422).json(error)),
   )()
 })
+
+function getPayload (payload?: JWTPayload) {
+  return payload ?? { id: '' }
+}
 
 export function start () {
   app.listen(PORT, () => {
