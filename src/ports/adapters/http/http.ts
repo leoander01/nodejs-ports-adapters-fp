@@ -3,7 +3,7 @@ import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { verifyToken } from '@/ports/adapters/jwt'
 
-export * from '@/ports/express/server'
+export * from '@/ports/fastify/server'
 
 export function getError (errors: string) {
   return {

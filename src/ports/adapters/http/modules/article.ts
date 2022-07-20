@@ -3,8 +3,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { CreateArticle, ArticleOutput } from '@/core/article/types'
 import { CommentOutput, CreateComment } from '@/core/comment/types'
 import * as db from '@/ports/adapters/db'
-import * as article from '@/core/article/use-cases/register-article-adapter'
-import * as comment from '@/core/article/use-cases/add-comment-to-an-article-adapter'
+import * as article from '@/core/article/use-cases'
 import { getError } from '@/ports/adapters/http/http'
 
 export function registerArticle (data: CreateArticle) {
@@ -19,7 +18,7 @@ export function registerArticle (data: CreateArticle) {
 export function addCommentToAnArticle (data: CreateComment) {
   return pipe(
     data,
-    comment.addCommentToAnArticle(db.addCommentToAnArticleInDB),
+    article.addCommentToAnArticle(db.addCommentToAnArticleInDB),
     TE.map(getAddCommentToAnArticleResponse),
     TE.mapLeft(error => getError(error.message)),
   )
