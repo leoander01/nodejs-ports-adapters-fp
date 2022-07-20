@@ -4,14 +4,13 @@ import fastify, {
   HookHandlerDoneFunction,
 } from 'fastify'
 import { pipe } from 'fp-ts/function'
-import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 // import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
 import { CreateUser, LoginUser } from '@/core/user/types'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
-import { getError, getToken } from '@/ports/adapters/http/http'
+import { authMiddleware } from '@/ports/adapters/http/http'
 import * as user from '@/ports/adapters/http/modules/user'
 import * as article from '@/ports/adapters/http/modules/article'
 import { JWTPayload } from '@/ports/adapters/jwt'
@@ -63,15 +62,12 @@ type AuthPreValidation = <T>(
 
 const auth: AuthPreValidation = (req, reply, done) => {
   pipe(
-    TE.tryCatch(
-      () => getToken(req.headers.authorization),
-      E.toError,
-    ),
+    authMiddleware(req.headers.authorization),
     TE.map((payload) => {
       req.raw.auth = payload
       return done()
     }),
-    TE.mapLeft(() => reply.code(401).send(getError('Unauthorized'))),
+    TE.mapLeft((error) => reply.code(401).send(error)),
   )()
 }
 
