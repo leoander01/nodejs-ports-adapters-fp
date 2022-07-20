@@ -1,6 +1,4 @@
 import fastify, {
-  RouteShorthandOptions,
-  RawReplyDefaultExpression,
   FastifyRequest,
   FastifyReply,
   HookHandlerDoneFunction,
@@ -57,11 +55,13 @@ app.post<UsersLogin>('/api/users/login', (req, reply) => {
   )()
 })
 
-const auth = <T>(
+type AuthPreValidation = <T>(
   req: FastifyRequest<T, http.Server, CustomRequest>,
   reply: FastifyReply,
   done: HookHandlerDoneFunction,
-) => {
+) => void
+
+const auth: AuthPreValidation = (req, reply, done) => {
   pipe(
     TE.tryCatch(
       () => getToken(req.headers.authorization),
@@ -75,17 +75,11 @@ const auth = <T>(
   )()
 }
 
-type FastifyApiGetCurrentUser = RouteShorthandOptions<
-  http.Server,
-  CustomRequest,
-  RawReplyDefaultExpression<http.Server>
->
-
-const getCurrentUserOptions: FastifyApiGetCurrentUser = {
-  preValidation: (...args) => auth(...args),
+const authOptions = {
+  preValidation: auth,
 }
 
-app.get('/api/user', getCurrentUserOptions, (req, reply) => {
+app.get('/api/user', authOptions, (req, reply) => {
   pipe(
     user.getCurrentUser({
       payload: req.raw.auth,
@@ -102,18 +96,7 @@ type ApiArticles = {
   }
 }
 
-type FastifyApiArticleOptions = RouteShorthandOptions<
-  http.Server,
-  CustomRequest,
-  RawReplyDefaultExpression<http.Server>,
-  ApiArticles
->
-
-const articleApiOptions: FastifyApiArticleOptions = {
-  preValidation: (...args) => auth<ApiArticles>(...args),
-}
-
-app.post<ApiArticles>('/api/articles', articleApiOptions, (req, reply) => {
+app.post<ApiArticles>('/api/articles', authOptions, (req, reply) => {
   const data = {
     ...req.body.article,
     authorId: req.raw.auth.id,
@@ -137,18 +120,7 @@ type ApiAddComment = {
   }
 }
 
-type FastifyApiAddCommentOptions = RouteShorthandOptions<
-  http.Server,
-  CustomRequest,
-  RawReplyDefaultExpression<http.Server>,
-  ApiAddComment
->
-
-const addCommentOptions: FastifyApiAddCommentOptions = {
-  preValidation: (...args) => auth<ApiAddComment>(...args),
-}
-
-app.post<ApiAddComment>('/api/articles/:slug/comments', addCommentOptions, (req, reply) => {
+app.post<ApiAddComment>('/api/articles/:slug/comments', authOptions, (req, reply) => {
   const data = {
     ...req.body.comment,
     authorId: req.raw.auth.id,
