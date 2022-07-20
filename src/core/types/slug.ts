@@ -16,7 +16,7 @@ export const slugCodec = withMessage(
 
 export type Slug = t.TypeOf<typeof slugCodec>
 
-function isSlug (value: string) {
+function isSlug (value: string = '') {
   /*
   * Accept:
   * - starts with any letter;

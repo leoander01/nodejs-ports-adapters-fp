@@ -1,8 +1,8 @@
 import { pipe } from 'fp-ts/function'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
-import { CreateArticle } from '@/core/article/types'
-import { validateArticle } from './validate-article'
+import { createArticleCodec, CreateArticle } from '@/core/article/types'
+import { validateCodec } from '@/helpers/validate-codec'
 
 export type OutsideRegisterArticle<A> = (data: CreateArticle) => Promise<A>
 
@@ -12,7 +12,7 @@ export type RegisterArticle = <A>(outsideRegister: OutsideRegisterArticle<A>) =>
 export const registerArticle: RegisterArticle = (outsideRegister) => (data) => {
   return pipe(
     data,
-    validateArticle,
+    validateCodec(createArticleCodec),
     TE.fromEither,
     TE.chain(() => TE.tryCatch(
       () => outsideRegister(data),

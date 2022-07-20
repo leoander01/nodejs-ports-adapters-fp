@@ -7,7 +7,7 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 // import { env } from '@/helpers/env'
 import { Slug } from '@/core/types/slug'
-import { CreateUser, LoginUser } from '@/core/user/types'
+import { CreateUser, LoginUser, UpdateUser } from '@/core/user/types'
 import { CreateArticle } from '@/core/article/types'
 import { CreateComment } from '@/core/comment/types'
 import { authMiddleware } from '@/ports/adapters/http/http'
@@ -24,13 +24,13 @@ const app = fastify<http.Server, CustomRequest>({ logger: true })
 
 // const PORT = env('PORT')
 
-type ApiUsers = {
+type CreateUserApi = {
   Body:{
     user: CreateUser
   }
 }
 
-app.post<ApiUsers>('/api/users', (req, reply) => {
+app.post<CreateUserApi>('/api/users', (req, reply) => {
   pipe(
     req.body.user,
     user.registerUser,
@@ -39,13 +39,13 @@ app.post<ApiUsers>('/api/users', (req, reply) => {
   )()
 })
 
-type UsersLogin = {
+type LoginUserApi = {
   Body: {
     user: LoginUser
   }
 }
 
-app.post<UsersLogin>('/api/users/login', (req, reply) => {
+app.post<LoginUserApi>('/api/users/login', (req, reply) => {
   pipe(
     req.body.user,
     user.login,
@@ -78,7 +78,7 @@ const authOptions = {
 app.get('/api/user', authOptions, (req, reply) => {
   pipe(
     user.getCurrentUser({
-      payload: req.raw.auth,
+      id: req.raw.auth.id,
       authHeader: req.headers.authorization,
     }),
     TE.map(result => reply.send(result)),
@@ -86,13 +86,31 @@ app.get('/api/user', authOptions, (req, reply) => {
   )()
 })
 
-type ApiArticles = {
+type UpdateUserApi = {
+  Body: {
+    user: UpdateUser
+  }
+}
+
+app.put<UpdateUserApi>('/api/user', authOptions, (req, reply) => {
+  pipe(
+    req.body.user,
+    user.updateUser({
+      id: req.raw.auth.id,
+      authHeader: req.headers.authorization,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(error => reply.code(422).send(error)),
+  )()
+})
+
+type CreateArticleApi = {
   Body: {
     article: CreateArticle
   }
 }
 
-app.post<ApiArticles>('/api/articles', authOptions, (req, reply) => {
+app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
   const data = {
     ...req.body.article,
     authorId: req.raw.auth.id,
@@ -106,7 +124,7 @@ app.post<ApiArticles>('/api/articles', authOptions, (req, reply) => {
   )()
 })
 
-type ApiAddComment = {
+type AddCommentApi = {
   Body: {
     comment: CreateComment
   }
@@ -116,7 +134,7 @@ type ApiAddComment = {
   }
 }
 
-app.post<ApiAddComment>('/api/articles/:slug/comments', authOptions, (req, reply) => {
+app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply) => {
   const data = {
     ...req.body.comment,
     authorId: req.raw.auth.id,

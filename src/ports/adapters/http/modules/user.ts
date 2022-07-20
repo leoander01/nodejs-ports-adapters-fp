@@ -1,11 +1,16 @@
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
+import { CreateUser, LoginUser, UpdateUser, UserOutput } from '@/core/user/types'
+import * as user from '@/core/user/use-cases'
 import * as db from '@/ports/adapters/db'
 import * as jwt from '@/ports/adapters/jwt'
 import { extractToken, getError } from '@/ports/adapters/http/http'
-import { CreateUser, LoginUser, UserOutput } from '@/core/user/types'
-import * as user from '@/core/user/use-cases/register-user-adapter'
+
+type UserIdAndAuthHeader = {
+  id: string
+  authHeader?: string
+}
 
 export function registerUser (data: CreateUser) {
   return pipe(
@@ -19,6 +24,17 @@ export function registerUser (data: CreateUser) {
       TE.map(token => ({ user, token })),
     )),
     TE.map(getUserResponse),
+    TE.mapLeft(error => getError(error.message)),
+  )
+}
+
+export const updateUser = ({ id, authHeader }: UserIdAndAuthHeader) => (data: UpdateUser) => {
+  const token = extractToken(authHeader)
+
+  return pipe(
+    data,
+    user.updateUser(db.updateUserInDB(id)),
+    TE.map(user => getUserResponse({ user, token })),
     TE.mapLeft(error => getError(error.message)),
   )
 }
@@ -41,18 +57,12 @@ export function login (data: LoginUser) {
   )
 }
 
-type GetCurrentUserInput = {
-  payload: jwt.JWTPayloadInput
-  authHeader?: string
-}
-
-export function getCurrentUser ({ payload, authHeader }: GetCurrentUserInput) {
-  const userId = payload.id
+export function getCurrentUser ({ id, authHeader }: UserIdAndAuthHeader) {
   const token = extractToken(authHeader)
 
   return pipe(
     TE.tryCatch(
-      () => db.getCurrentUser(userId),
+      () => db.getCurrentUser(id),
       E.toError,
     ),
     TE.map(user => getUserResponse({ user, token })),
