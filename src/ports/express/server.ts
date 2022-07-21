@@ -80,6 +80,18 @@ app.put('/api/user', auth, (req: Request, res: Response) => {
   )()
 })
 
+app.get('/api/profiles/:username', (req: Request, res: Response) => {
+  const username = 'username'
+
+  pipe(
+    user.getProfile({
+      username: req.params[username] ?? '',
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 app.post('/api/articles', auth, async (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
 
