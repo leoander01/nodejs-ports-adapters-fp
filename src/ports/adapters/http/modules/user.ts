@@ -53,7 +53,7 @@ export function login (data: LoginUser) {
       TE.map(token => ({ user, token })),
     )),
     TE.map(getUserResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 

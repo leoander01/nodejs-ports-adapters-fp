@@ -11,7 +11,7 @@ export function registerArticle (data: CreateArticle) {
     data,
     article.registerArticle(db.createArticleInDB),
     TE.map(getArticleResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 
