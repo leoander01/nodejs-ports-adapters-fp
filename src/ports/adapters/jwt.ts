@@ -1,5 +1,6 @@
 import * as jwt from '@/ports/jwt/jose'
 import { AuthorId } from '@/core/article/types'
+import { ValidationError } from '@/helpers/errors'
 
 export type JWTPayload = { id: AuthorId }
 
@@ -18,7 +19,7 @@ export const verifyToken = async (token: string) => {
     return payload
   }
 
-  throw new Error('Invalid payload. Author ID is missing')
+  throw new ValidationError('Invalid payload. Author ID is missing')
 }
 
 type Obj = {}

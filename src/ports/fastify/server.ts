@@ -35,7 +35,7 @@ app.post<CreateUserApi>('/api/users', (req, reply) => {
     req.body.user,
     user.registerUser,
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.status(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 
@@ -50,7 +50,7 @@ app.post<LoginUserApi>('/api/users/login', (req, reply) => {
     req.body.user,
     user.login,
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.status(422).send(error)),
+    TE.mapLeft(result => reply.status(result.code).send(result)),
   )()
 })
 
@@ -67,7 +67,7 @@ const auth: AuthPreValidation = (req, reply, done) => {
       req.raw.auth = payload
       return done()
     }),
-    TE.mapLeft((error) => reply.code(401).send(error)),
+    TE.mapLeft((result) => reply.code(result.code).send(result.error)),
   )()
 }
 
@@ -82,7 +82,7 @@ app.get('/api/user', authOptions, (req, reply) => {
       authHeader: req.headers.authorization,
     }),
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.code(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 
@@ -100,7 +100,7 @@ app.put<UpdateUserApi>('/api/user', authOptions, (req, reply) => {
       authHeader: req.headers.authorization,
     }),
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.code(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 
@@ -116,7 +116,7 @@ app.get<GetProfileApi>('/api/profiles/:username', (req, reply) => {
       username: req.params.username,
     }),
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.code(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 
@@ -136,7 +136,7 @@ app.post<CreateArticleApi>('/api/articles', authOptions, (req, reply) => {
     data,
     article.registerArticle,
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.status(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 
@@ -161,7 +161,7 @@ app.post<AddCommentApi>('/api/articles/:slug/comments', authOptions, (req, reply
     data,
     article.addCommentToAnArticle,
     TE.map(result => reply.send(result)),
-    TE.mapLeft(error => reply.code(422).send(error)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
   )()
 })
 

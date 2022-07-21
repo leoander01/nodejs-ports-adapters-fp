@@ -20,7 +20,7 @@ export function addCommentToAnArticle (data: CreateComment) {
     data,
     article.addCommentToAnArticle(db.addCommentToAnArticleInDB),
     TE.map(getAddCommentToAnArticleResponse),
-    TE.mapLeft(error => getError(error.message)),
+    TE.mapLeft(getError),
   )
 }
 

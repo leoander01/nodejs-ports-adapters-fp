@@ -29,7 +29,7 @@ app.post('/api/users', async (req: Request, res: Response) => {
     req.body.user,
     user.registerUser,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(400).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
@@ -38,7 +38,7 @@ app.post('/api/users/login', async (req: Request, res: Response) => {
     req.body.user,
     user.login,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
@@ -62,7 +62,7 @@ app.get('/api/user', auth, async (req: Request, res: Response) => {
       authHeader: req.header('authorization'),
     }),
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
@@ -76,7 +76,7 @@ app.put('/api/user', auth, (req: Request, res: Response) => {
       authHeader: req.header('authorization'),
     }),
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
@@ -92,7 +92,7 @@ app.post('/api/articles', auth, async (req: Request, res: Response) => {
     data,
     article.registerArticle,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
@@ -110,7 +110,7 @@ app.post('/api/articles/:slug/comments', auth, async (req: Request, res: Respons
     data,
     article.addCommentToAnArticle,
     TE.map(result => res.json(result)),
-    TE.mapLeft(error => res.status(422).json(error)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
 })
 
