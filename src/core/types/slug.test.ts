@@ -26,7 +26,7 @@ it('Should not accept number at the beginning of the slug', () => {
     '3invalid-slug',
     slugCodec.decode,
     TE.fromEither,
-    mapAll(errors => expect(getErrorMessage(errors)).toBe('Invalid slug. Please, use alphanumeric characters, dash and/or numbers')),
+    mapAll(errors => expect(getErrorMessage(errors)).toBe('Invalid slug. Please, use alphanumeric characters, dash, underline and/or numbers')),
   )()
 })
 
@@ -35,6 +35,6 @@ it('Should not accept dashes at the end of the slug', () => {
     'invalid-slug-',
     slugCodec.decode,
     TE.fromEither,
-    mapAll(errors => expect(getErrorMessage(errors)).toBe('Invalid slug. Please, use alphanumeric characters, dash and/or numbers')),
+    mapAll(errors => expect(getErrorMessage(errors)).toBe('Invalid slug. Please, use alphanumeric characters, dash, underline and/or numbers')),
   )()
 })

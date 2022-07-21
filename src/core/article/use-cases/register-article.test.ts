@@ -22,7 +22,7 @@ const dataWithInvalidTagList: CreateArticle = {
   title: 'Article title 3',
   body: 'Article body 3',
   description: 'Article description 3',
-  tagList: [unsafe('taG1'), unsafe('3ag2')],
+  tagList: [unsafe('tag1'), unsafe('3ag2-wrong')],
   authorId: unsafe('ccaacb3c-c076-4d75-830a-a094d11589f3'),
 }
 
@@ -69,7 +69,7 @@ it('Should not accept article register if tagList has invalid slugs', async () =
     dataWithInvalidTagList,
     registerArticle(registerFail),
     mapAll(result => {
-      expect(result).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash and/or numbers:::Invalid slug. Please, use alphanumeric characters, dash and/or numbers'))
+      expect(result).toEqual(new Error('Invalid slug. Please, use alphanumeric characters, dash, underline and/or numbers'))
     }),
   )()
 })
