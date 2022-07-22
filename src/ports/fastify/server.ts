@@ -3,7 +3,7 @@ import fastify, {
   FastifyReply,
   HookHandlerDoneFunction,
 } from 'fastify'
-import fastifyCors from 'fastify-cors'
+// import fastifyCors from 'fastify-cors'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 // import { env } from '@/helpers/env'
@@ -24,14 +24,13 @@ type CustomRequest = http.IncomingMessage & {
 const app = fastify<http.Server, CustomRequest>({ logger: true })
 
 // const PORT = env('PORT')
+// app.register(fastifyCors, { origin: true })
 
 type CreateUserApi = {
   Body:{
     user: CreateUser
   }
 }
-
-app.register(fastifyCors, { origin: true })
 
 app.post<CreateUserApi>('/api/users', (req, reply) => {
   pipe(
