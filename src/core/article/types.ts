@@ -1,6 +1,6 @@
 import * as t from 'io-ts'
-import { profileCodec } from '@/core/profile/types'
-import { withMessage, UUID } from 'io-ts-types'
+import { profileCodec, authorIdOutputCodec } from '@/core/profile/types'
+import { withMessage } from 'io-ts-types'
 import { dateCodec, positiveCodec, slugCodec } from '@/core/types'
 import { tagCodec } from '@/core/tag/types'
 
@@ -35,14 +35,11 @@ export const articlesCodec = t.type({
 
 export type Articles = t.TypeOf<typeof articlesCodec>
 
-const authorIdCodec = withMessage(UUID, () => 'Invalid author ID')
-export type AuthorId = t.TypeOf<typeof authorIdCodec>
-
 const createArticleRequiredCodec = t.type({
   title: withMessage(t.string, () => 'Invalid title'),
   description: withMessage(t.string, () => 'Invalid description'),
   body: withMessage(t.string, () => 'Invalid body'),
-  authorId: authorIdCodec,
+  authorId: authorIdOutputCodec,
 })
 
 const createArticleOptional = t.partial({

@@ -1,10 +1,10 @@
 import * as jwt from '@/ports/jwt/jose'
-import { AuthorId } from '@/core/article/types'
+import { AuthorId, AuthorIdOutput } from '@/core/profile/types'
 import { ValidationError } from '@/helpers/errors'
 
 export type JWTPayload = { id: AuthorId }
 
-export type JWTPayloadInput = { id: string }
+export type JWTPayloadInput = { id: AuthorIdOutput }
 
 type ExpirationTime = string
 
