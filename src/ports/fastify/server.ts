@@ -3,6 +3,7 @@ import fastify, {
   FastifyReply,
   HookHandlerDoneFunction,
 } from 'fastify'
+import fastifyCors from 'fastify-cors'
 import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 // import { env } from '@/helpers/env'
@@ -29,6 +30,8 @@ type CreateUserApi = {
     user: CreateUser
   }
 }
+
+app.register(fastifyCors, { origin: true })
 
 app.post<CreateUserApi>('/api/users', (req, reply) => {
   pipe(
@@ -114,6 +117,23 @@ app.get<GetProfileApi>('/api/profiles/:username', (req, reply) => {
   pipe(
     user.getProfile({
       username: req.params.username,
+    }),
+    TE.map(result => reply.send(result)),
+    TE.mapLeft(result => reply.code(result.code).send(result.error)),
+  )()
+})
+
+type FollowUserApi = {
+  Params: {
+    username: string
+  }
+}
+
+app.post<FollowUserApi>('/api/profiles/:username/follow', authOptions, (req, reply) => {
+  pipe(
+    user.followUser({
+      userToFollow: req.params.username,
+      userId: req.raw.auth.id,
     }),
     TE.map(result => reply.send(result)),
     TE.mapLeft(result => reply.code(result.code).send(result.error)),
