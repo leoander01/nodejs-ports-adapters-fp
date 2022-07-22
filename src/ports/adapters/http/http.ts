@@ -4,7 +4,7 @@ import * as TE from 'fp-ts/TaskEither'
 import { verifyToken } from '@/ports/adapters/jwt'
 import { AuthError, DefaultError } from '@/helpers/errors'
 
-export * from '@/ports/express/server'
+export * from '@/ports/fastify/server'
 
 export function getError <E extends Error> (error: E) {
   return {

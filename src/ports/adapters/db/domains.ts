@@ -6,7 +6,8 @@ export const login = db.login
 
 export const getCurrentUserFromDB = db.getCurrentUserFromDB
 export const getProfileFromDB = db.getProfileFromDB
-export const followUserFromDB = db.getFollowUserFromDB
+export const followUser = db.followUser
+export const unfollowUser = db.unfollowUser
 
 export const createArticleInDB = db.createArticleInDB
 export const addCommentToAnArticleInDB = db.addCommentToAnArticleInDB

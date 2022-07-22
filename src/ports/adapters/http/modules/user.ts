@@ -93,7 +93,23 @@ type FollowUserInput = {
 export function followUser ({ userToFollow, userId }: FollowUserInput) {
   return pipe(
     TE.tryCatch(
-      () => db.followUserFromDB({ userToFollow, userId }),
+      () => db.followUser({ userToFollow, userId }),
+      E.toError,
+    ),
+    TE.map(profile => getProfileResponse({ profile, userId })),
+    TE.mapLeft(getError),
+  )
+}
+
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+export function unfollowUser ({ userToUnfollow, userId }: UnfollowUserInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.unfollowUser({ userToUnfollow, userId }),
       E.toError,
     ),
     TE.map(profile => getProfileResponse({ profile, userId })),
