@@ -4,11 +4,11 @@ import * as TE from 'fp-ts/TaskEither'
 import { verifyToken, JWTPayload } from '@/ports/adapters/jwt'
 import { AuthError, DefaultError } from '@/helpers/errors'
 
-export * from '@/ports/fastify/server'
+const COMMON_ERROR_CODE = 400
 
-export function getError <E extends Error> (error: E) {
+export function getError <E extends DefaultError> (error: E) {
   return {
-    code: error instanceof DefaultError ? error.code : 422,
+    code: error instanceof DefaultError ? error.code : COMMON_ERROR_CODE,
     error: {
       errors: {
         body: error.message.split(':::'),
