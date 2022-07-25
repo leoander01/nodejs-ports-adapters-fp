@@ -1,4 +1,5 @@
 import { pipe } from 'fp-ts/function'
+import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { CreateArticle, ArticleOutput } from '@/core/article/types'
 import { CommentOutput, CreateComment } from '@/core/comment/types'
@@ -13,6 +14,24 @@ export function registerArticle (data: CreateArticle) {
     TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )
+}
+
+export function fetchArticles () {
+  return pipe(
+    TE.tryCatch(
+      () => db.getArticles(),
+      E.toError,
+    ),
+    TE.map(getArticlesResponse),
+    TE.mapLeft(getError),
+  )
+}
+
+function getArticlesResponse (articles: db.database.DBArticle[]) {
+  return {
+    articles,
+    articlesCount: articles.length,
+  }
 }
 
 export function addCommentToAnArticle (data: CreateComment) {

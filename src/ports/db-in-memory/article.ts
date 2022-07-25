@@ -36,6 +36,12 @@ export const createArticleInDB = async (data: CreateArticle) => {
   }
 }
 
+export const getArticlesFromDB = async () => {
+  const articles = db.articles
+  return Object.values(articles)
+    .sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)
+}
+
 export const addCommentToAnArticleInDB = async (data: CreateComment) => {
   const date = new Date().toISOString()
   const id = Date.now()
