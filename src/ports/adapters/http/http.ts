@@ -6,7 +6,7 @@ import { AuthError, DefaultError } from '@/helpers/errors'
 
 const COMMON_ERROR_CODE = 400
 
-export function getError <E extends DefaultError> (error: E) {
+export function getError <E extends Error> (error: E) {
   return {
     code: error instanceof DefaultError ? error.code : COMMON_ERROR_CODE,
     error: {
