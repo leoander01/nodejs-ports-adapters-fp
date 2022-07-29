@@ -78,7 +78,7 @@ type GetProfileInput = {
 export function getProfile ({ username, userId }: GetProfileInput) {
   return pipe(
     TE.tryCatch(
-      () => db.getProfileFromDB(username),
+      () => db.getProfile(username),
       E.toError,
     ),
     TE.map(profile => getProfileResponse({ profile, userId })),

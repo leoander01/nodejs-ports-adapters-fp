@@ -1,10 +1,14 @@
 import argon2 from 'argon2'
-import { CreateUser } from '@/core/user/types'
+import {
+  CreateUser,
+  LoginUser,
+  UpdateUser,
+} from '@/core/user/types'
+import { NotFoundError, ValidationError } from '@/helpers/errors'
 import { database as db } from '../db'
 import { DBUser } from '../types'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
-
 export const createUserInDB: CreateUserInDB = async (data) => {
   const password = await argon2.hash(data.password)
 
@@ -14,11 +18,60 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   })
 }
 
-// export const createUserInDB = db.createUserInDB
-export const updateUserInDB = db.updateUserInDB
-export const login = db.login
+type Login = (data: LoginUser) => Promise<DBUser>
+export const login: Login = async (data) => {
+  const user = await db.login(data)
 
-export const getCurrentUserFromDB = db.getCurrentUserFromDB
-export const getProfileFromDB = db.getProfileFromDB
+  if (!user || !(await argon2.verify(user.password, data.password))) {
+    throw new ValidationError('Invalid email or password')
+  }
+
+  const { bio, image, ...result } = user
+
+  return result
+}
+
+type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
+export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
+  const password = data.password
+    ? (await argon2.hash(data.password))
+    : undefined
+
+  return db.updateUserInDB(id)({
+    ...data,
+    password,
+  })
+}
+
+type GetCurrentUserFromDB = (id: string) => Promise<DBUser>
+export const getCurrentUserFromDB: GetCurrentUserFromDB = async (id) => {
+  const user = await db.getCurrentUserFromDB(id)
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  return {
+    ...user,
+    bio: user.bio ?? undefined,
+    image: user.image ?? undefined,
+  }
+}
+
+type GetProfileFromDB = (username: string) => Promise<DBUser>
+export const getProfile: GetProfileFromDB = async (username) => {
+  const user = await db.getProfileFromDB(username)
+
+  if (!user) {
+    throw new NotFoundError('user does not exist')
+  }
+
+  return {
+    ...user,
+    bio: user.bio ?? undefined,
+    image: user.image ?? undefined,
+  }
+}
+
 export const followUser = db.followUser
 export const unfollowUser = db.unfollowUser

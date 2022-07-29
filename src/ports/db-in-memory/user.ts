@@ -1,12 +1,16 @@
-import argon2 from 'argon2'
 import { v4 as uuidv4 } from 'uuid'
-import { LoginUser, UpdateUser } from '@/core/user/types'
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
 } from '@/helpers/errors'
-import { CreateUserInDB, DBUser } from '@/ports/adapters/db/types'
+import {
+  CreateUserInDB,
+  GetCurrentUserFromDB,
+  GetProfileFromDB,
+  Login,
+  UpdateUserInDB,
+} from '@/ports/adapters/db/types'
 import { dbInMemory as db } from './db'
 
 export const createUserInDB: CreateUserInDB = async (data) => {
@@ -29,7 +33,11 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   return user
 }
 
-type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
+export const login: Login = async (data) => {
+  const userId = db.usersByEmail[data.email]
+  const user = db.users[userId ?? '']
+  return user ?? null
+}
 
 export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const user = db.users[id]
@@ -54,10 +62,6 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     throw new ValidationError('This username is already in use')
   }
 
-  const password = data.password
-    ? (await argon2.hash(data.password))
-    : user.password
-
   const email = data.email ?? user.email
   delete db.usersByEmail[user.email]
   db.usersByEmail[email] = id
@@ -69,8 +73,8 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   const newUser = db.users[id] = {
     id: user.id,
     email,
-    password,
     username,
+    password: data.password ?? user.password,
     bio: data.bio ?? user.bio,
     image: data.image ?? user.image,
   }
@@ -78,38 +82,15 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
   return newUser
 }
 
-type Login = (data: LoginUser) => Promise<DBUser>
-
-export const login: Login = async (data) => {
-  const userId = db.usersByEmail[data.email]
-  const user = db.users[userId ?? '']
-
-  if (!user || !(await argon2.verify(user.password, data.password))) {
-    throw new ValidationError('Invalid email or password')
-  }
-
+export const getCurrentUserFromDB: GetCurrentUserFromDB = async (id) => {
+  const user = db.users[id] ?? null
   return user
 }
 
-export const getCurrentUserFromDB = async (id: string) => {
-  const user = db.users[id]
-
-  if (!user) {
-    throw new NotFoundError('User does not exist')
-  }
-
-  return user
-}
-
-export const getProfileFromDB = async (username: string) => {
+export const getProfileFromDB: GetProfileFromDB = async (username) => {
   const profileId = db.usersByUsername[username]
   const user = db.users[profileId ?? '']
-
-  if (!user) {
-    throw new NotFoundError('User does not exist')
-  }
-
-  return user
+  return user ?? null
 }
 
 type FollowUserInput = {
@@ -148,7 +129,6 @@ type UnfollowUserInput = {
   userToUnfollow: string
   userId: string
 }
-
 export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput) => {
   const user = db.users[userId]
 
