@@ -6,6 +6,7 @@ import {
   Login,
   UpdateUserInDB,
   FollowUser,
+  UnfollowUser,
 } from '@/ports/adapters/db/types'
 import { ForbiddenError, NotFoundError, ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
@@ -38,7 +39,7 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
   try {
     const user = await prisma.user.update({
       where: {
-        id,
+        id: id,
       },
       data: {
         email: data.email,
@@ -65,9 +66,7 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
 
 export const getCurrentUserFromDB: GetCurrentUserFromDB<User> = async (id) => {
   return prisma.user.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
   })
 }
 
@@ -135,11 +134,7 @@ export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => 
   }
 }
 
-type UnfollowUserInput = {
-  userToUnfollow: string
-  userId: string
-}
-export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput) => {
+export const unfollowUser: UnfollowUser<User> = async ({ userToUnfollow, userId }) => {
   const userToUnfollowData = await prisma.user.findUnique({
     select: { id: true },
     where: { username: userToUnfollow },
