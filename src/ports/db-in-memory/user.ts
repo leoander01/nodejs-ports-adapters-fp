@@ -140,7 +140,7 @@ export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput
   }
 
   if (userToUnfollowId === userId) {
-    throw new ForbiddenError('You cannot follow yourself')
+    throw new ForbiddenError('You cannot unfollow yourself')
   }
 
   if (

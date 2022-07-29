@@ -135,10 +135,57 @@ export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => 
   }
 }
 
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+export const unfollowUser = async ({ userToUnfollow, userId }: UnfollowUserInput) => {
+  const userToUnfollowData = await prisma.user.findUnique({
+    select: { id: true },
+    where: { username: userToUnfollow },
+  })
+
+  if (!userToUnfollowData) {
+    throw new ForbiddenError(`User ${userToUnfollow} does not exist`)
+  }
+
+  if (userToUnfollowData.id === userId) {
+    throw new ForbiddenError('You cannot unfollow yourself')
+  }
+
+  try {
+    await prisma.follower.deleteMany({
+      where: {
+        userId,
+        followingId: userToUnfollowData.id,
+      },
+    })
+  } catch (e) {}
+
+  const profile = await prisma.user.findUnique({
+    where: { username: userToUnfollow },
+    include: {
+      following: true,
+      whoIsFollowing: true,
+    },
+  })
+
+  if (!profile) {
+    throw new ForbiddenError(`User ${userToUnfollow} does not exist`)
+  }
+
+  return {
+    ...profile,
+    following: transformFollower('followingId', profile.following),
+    followers: transformFollower('userId', profile.whoIsFollowing),
+  }
+}
+
 type Field = keyof Follower
+type HashmapStrBool = { [key: string]: boolean }
 function transformFollower (field: Field, data: Follower[]) {
-  return data.reduce((acc, f) => {
+  return data.reduce<HashmapStrBool>((acc, f) => {
     acc[f[field]] = true
     return acc
-  }, {} as { [key: string]: boolean })
+  }, {})
 }
