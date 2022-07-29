@@ -5,7 +5,7 @@ import {
   UpdateUser,
 } from '@/core/user/types'
 import { NotFoundError, ValidationError } from '@/helpers/errors'
-import { database as db } from '../db'
+import { database, database as db } from '../db'
 import { DBUser } from '../types'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
@@ -89,4 +89,18 @@ export const followUser: FollowUser = async (input) => {
   }
 }
 
-export const unfollowUser = db.unfollowUser
+type UnfollowUserInput = {
+  userToUnfollow: string
+  userId: string
+}
+
+type UnfollowUser = (input: UnfollowUserInput) => Promise<DBUser>
+export const unfollowUser: UnfollowUser = async (input) => {
+  const profile = await db.unfollowUser(input)
+
+  return {
+    ...profile,
+    bio: profile.bio ?? undefined,
+    image: profile.image ?? undefined,
+  }
+}
