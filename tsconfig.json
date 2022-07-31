@@ -1,19 +1,14 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig.json to read more about this file */
-
-    /* Basic Options */
     "target": "esnext",
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./",
-    "lib": ["esnext"],
+    "lib": ["ESNext"],
 
-    /* Strict Type-Checking Options */
     "strict": true,
 
-    /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -21,7 +16,6 @@
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
 
-    /* Module Resolution Options */
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
@@ -32,7 +26,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
 
-    /* Advanced Options */
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
@@ -43,5 +36,5 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
+  ]
 }
