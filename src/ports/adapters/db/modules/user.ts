@@ -5,17 +5,23 @@ import {
   UpdateUser,
 } from '@/core/user/types'
 import { NotFoundError, ValidationError } from '@/helpers/errors'
-import { database, database as db } from '../db'
+import { database as db } from '../db'
 import { DBUser } from '../types'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
 export const createUserInDB: CreateUserInDB = async (data) => {
   const password = await argon2.hash(data.password)
 
-  return db.createUserInDB({
+  const newUser = await db.createUserInDB({
     ...data,
     password,
   })
+
+  return {
+    ...newUser,
+    bio: newUser.bio ?? undefined,
+    image: newUser.image ?? undefined,
+  }
 }
 
 type Login = (data: LoginUser) => Promise<DBUser>
@@ -37,10 +43,16 @@ export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
     ? (await argon2.hash(data.password))
     : undefined
 
-  return db.updateUserInDB(id)({
+  const updatedUser = await db.updateUserInDB(id)({
     ...data,
     password,
   })
+
+  return {
+    ...updatedUser,
+    bio: updatedUser.bio ?? undefined,
+    image: updatedUser.image ?? undefined,
+  }
 }
 
 type GetCurrentUserFromDB = (id: string) => Promise<DBUser>
