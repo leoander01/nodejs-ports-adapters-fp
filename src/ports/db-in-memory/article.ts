@@ -51,9 +51,14 @@ export const getArticlesFromDB = async () => {
       const { authorId, ...rest } = article
       const author = db.users[authorId]
 
+      if (!author) {
+        throw new NotFoundError('User does not exist')
+      }
+
       return {
         ...rest,
         favorited: false,
+        authorId,
         author,
       }
     })
