@@ -1,10 +1,11 @@
 import { pipe } from 'fp-ts/function'
-// import * as E from 'fp-ts/Either'
+import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { CreateArticle, ArticleOutput } from '@/core/article/types'
-import { CreateComment } from '@/core/comment/types'
+import { CreateComment, CommentOutput } from '@/core/comment/types'
 import * as db from '@/ports/adapters/db'
 import * as article from '@/core/article/use-cases'
+import { DBArticle } from '@/ports/adapters/db/types'
 import { getError } from '@/ports/adapters/http/http'
 
 export function registerArticle (data: CreateArticle) {
@@ -16,28 +17,29 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
-// export function fetchArticles () {
-//   return pipe(
-//     TE.tryCatch(
-//       () => db.getArticles(),
-//       E.toError,
-//     ),
-//     TE.map(getArticlesResponse),
-//     TE.mapLeft(getError),
-//   )
-// }
+export function fetchArticles () {
+  return pipe(
+    TE.tryCatch(
+      () => db.getArticlesFromDB(),
+      E.toError,
+    ),
+    TE.map(getArticlesResponse),
+    TE.mapLeft(getError),
+  )
+}
 
-// function getArticlesResponse (articles: db.database.DBArticle[]) {
-//   return {
-//     articles,
-//     articlesCount: articles.length,
-//   }
-// }
+function getArticlesResponse (articles: DBArticle[]) {
+  return {
+    articles,
+    articlesCount: articles.length,
+  }
+}
 
 export function addCommentToAnArticle (data: CreateComment) {
   return pipe(
     data,
     article.addCommentToAnArticle(db.addCommentToAnArticleInDB),
+    TE.map(getCommentResponse),
     TE.mapLeft(getError),
   )
 }
@@ -53,5 +55,11 @@ const getArticleResponse = (article: GetArticleREsponseInput) => {
       ...articleResponse,
       favorited: false,
     },
+  }
+}
+
+const getCommentResponse = (comment: CommentOutput) => {
+  return {
+    comment,
   }
 }

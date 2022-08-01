@@ -44,11 +44,22 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
   }
 }
 
-// export const getArticlesFromDB = async () => {
-//   const articles = db.articles
-//   return Object.values(articles)
-//     .sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)
-// }
+export const getArticlesFromDB = async () => {
+  const articles = db.articles
+  return Object.values(articles)
+    .map(article => {
+      const { authorId, ...rest } = article
+      const author = db.users[authorId]
+
+      return {
+        ...rest,
+        favorited: false,
+        author,
+      }
+    })
+    .sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)
+}
+
 type CommentReturned = DBComment & {
   author: DBUser
 }
