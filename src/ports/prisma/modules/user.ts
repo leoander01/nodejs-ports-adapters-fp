@@ -52,11 +52,12 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
 
     return user
   } catch (e) {
-    if (e.message.includes('constraint failed on the fields: (`email`)')) {
+    const error = e as Error
+    if (error.message.includes('constraint failed on the fields: (`email`)')) {
       throw new ValidationError('This email is already in use')
     }
 
-    if (e.message.includes('constraint failed on the fields: (`username`)')) {
+    if (error.message.includes('constraint failed on the fields: (`username`)')) {
       throw new ValidationError('This username is already in use')
     }
 
