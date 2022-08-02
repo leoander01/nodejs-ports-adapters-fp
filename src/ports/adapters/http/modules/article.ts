@@ -7,6 +7,7 @@ import * as db from '@/ports/adapters/db'
 import * as article from '@/core/article/use-cases'
 import { DBArticle } from '@/ports/adapters/db/types'
 import { getError } from '@/ports/adapters/http/http'
+import { ArticlesFilter } from '../types'
 
 export function registerArticle (data: CreateArticle) {
   return pipe(
@@ -17,10 +18,10 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
-export function fetchArticles () {
+export function fetchArticles (filter: ArticlesFilter) {
   return pipe(
     TE.tryCatch(
-      () => db.getArticlesFromDB(),
+      () => db.getArticlesFromDB(filter),
       E.toError,
     ),
     TE.map(getArticlesResponse),

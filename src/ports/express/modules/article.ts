@@ -23,9 +23,9 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
-articleRoutes.get('/api/articles', (_req: Request, res: Response) => {
+articleRoutes.get('/api/articles', (req: Request, res: Response) => {
   pipe(
-    article.fetchArticles(),
+    article.fetchArticles(req.query),
     TE.map(result => res.json(result)),
     TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()
