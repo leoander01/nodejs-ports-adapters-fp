@@ -89,6 +89,51 @@ export const getArticlesFromDB = async (filter?: ArticlesFilter) => {
   }))
 }
 
+type FavoriteArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
+  const article = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+  })
+
+  if (!article) {
+    throw new ValidationError(`Article ${data.slug} does not exist`)
+  }
+
+  try {
+    const favoritedArticle = await prisma.favorite.create({
+      data: {
+        userId: data.userId,
+        articleId: article.id,
+      },
+      include: {
+        article: {
+          include: {
+            author: true,
+            tagList: true,
+          },
+        },
+      },
+    })
+
+    return {
+      ...favoritedArticle.article,
+      favorited: true,
+      favoritesCount: 0,
+      tagList: favoritedArticle.article.tagList.map(({ name }) => name),
+      createdAt: favoritedArticle.article.createdAt.toISOString(),
+      updatedAt: favoritedArticle.article.updatedAt.toISOString(),
+    }
+  } catch (e) {
+    throw new ValidationError(`Error trying to favorite article ${data.slug}`)
+  }
+}
+
 type CommentReturned = Omit<Comment, 'createdAt' | 'updatedAt'> & {
   createdAt: string
   updatedAt: string
