@@ -130,7 +130,59 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
       updatedAt: favoritedArticle.article.updatedAt.toISOString(),
     }
   } catch (e) {
+    const error = e as Error
+    if (error.message.includes('Unique constraint failed on the fields: (`userId`,`articleId`)')) {
+      throw new ValidationError(`The article ${data.slug} is already a favorite`)
+    }
+
     throw new ValidationError(`Error trying to favorite article ${data.slug}`)
+  }
+}
+
+export const unfavoriteArticleInDB = async (data: FavoriteArticleInput) => {
+  const article = await prisma.article.findUnique({
+    where: {
+      slug: data.slug,
+    },
+  })
+
+  if (!article) {
+    throw new ValidationError(`Article ${data.slug} does not exist`)
+  }
+
+  try {
+    const unfavoritedArticle = await prisma.favorite.delete({
+      where: {
+        userId_articleId: {
+          userId: data.userId,
+          articleId: article.id,
+        },
+      },
+      include: {
+        article: {
+          include: {
+            author: true,
+            tagList: true,
+          },
+        },
+      },
+    })
+
+    return {
+      ...unfavoritedArticle.article,
+      favorited: false,
+      favoritesCount: 0,
+      tagList: unfavoritedArticle.article.tagList.map(({ name }) => name),
+      createdAt: unfavoritedArticle.article.createdAt.toISOString(),
+      updatedAt: unfavoritedArticle.article.updatedAt.toISOString(),
+    }
+  } catch (e) {
+    const error = e as Error
+    if (error.message.includes('Record to delete does not exist')) {
+      throw new ValidationError(`The article ${data.slug} is not a favorite`)
+    }
+
+    throw new ValidationError(`Error trying to unfavorite article ${data.slug}`)
   }
 }
 
