@@ -65,18 +65,9 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     },
     where: {
       AND: [
-        {
-          author: {
-            username: filter?.author,
-          },
-        },
-        {
-          tagList: {
-            some: {
-              name: filter?.tag,
-            },
-          },
-        },
+        authorFilter(filter?.author),
+        tagListFilter(filter?.tag),
+        favoritedFilter(filter?.favorited),
       ],
     },
     include: {
@@ -106,6 +97,42 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
       updatedAt: article.updatedAt.toISOString(),
     }
   })
+}
+
+function authorFilter (author?: string) {
+  return {
+    author: {
+      username: author,
+    },
+  }
+}
+
+function tagListFilter (tag?: string) {
+  return {
+    tagLList: {
+      some: {
+        name: tag,
+      },
+    },
+  }
+}
+
+function favoritedFilter (favorited?: string) {
+  const withFavoritedFilter = {
+    favoritedArticles: {
+      some: {
+        user: {
+          username: favorited,
+        },
+      },
+    },
+  }
+
+  const withoutFavoritedFilter = {}
+
+  return favorited
+    ? withFavoritedFilter
+    : withoutFavoritedFilter
 }
 
 type FavoriteArticleInput = {
