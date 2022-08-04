@@ -109,7 +109,7 @@ function authorFilter (author?: string) {
 
 function tagListFilter (tag?: string) {
   return {
-    tagLList: {
+    tagList: {
       some: {
         name: tag,
       },
