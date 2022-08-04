@@ -1,3 +1,3 @@
-import { start } from '@/ports/express'
+import { start } from '@/ports/fastify'
 
 start()
