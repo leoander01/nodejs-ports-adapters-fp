@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as article from '@/ports/adapters/http/modules/article'
 import { getPayload } from '@/ports/adapters/http/http'
-import { auth, Request } from '../server'
+import { auth, Request, tryAuth } from '../server'
 
 const articleRoutes = Router()
 
@@ -23,9 +23,14 @@ articleRoutes.post('/api/articles', auth, async (req: Request, res: Response) =>
   )()
 })
 
-articleRoutes.get('/api/articles', (req: Request, res: Response) => {
+articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
   pipe(
-    article.fetchArticles(req.query),
+    article.fetchArticles({
+      filter: req.query,
+      userId: payload.id,
+    }),
     TE.map(result => res.json(result)),
     TE.mapLeft(result => res.status(result.code).json(result.error)),
   )()

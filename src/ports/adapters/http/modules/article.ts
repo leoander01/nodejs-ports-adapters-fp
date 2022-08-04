@@ -18,10 +18,15 @@ export function registerArticle (data: CreateArticle) {
   )
 }
 
-export function fetchArticles (filter: ArticlesFilter) {
+type FetchArticlesInput = {
+  filter: ArticlesFilter
+  userId: string
+}
+
+export function fetchArticles ({ filter, userId }: FetchArticlesInput) {
   return pipe(
     TE.tryCatch(
-      () => db.getArticlesFromDB(filter),
+      () => db.getArticlesFromDB({ filter, userId }),
       E.toError,
     ),
     TE.map(getArticlesResponse),
@@ -40,6 +45,7 @@ export function favoriteArticle (data: FavoriteArticleInput) {
       () => db.favoriteArticleInDB(data),
       E.toError,
     ),
+    TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )
 }
@@ -50,6 +56,7 @@ export function unfavoriteArticle (data: FavoriteArticleInput) {
       () => db.unfavoriteArticleInDB(data),
       E.toError,
     ),
+    TE.map(getArticleResponse),
     TE.mapLeft(getError),
   )
 }
@@ -77,10 +84,7 @@ type GetArticleREsponseInput = Omit<ArticleOutput, 'favorited'> & {
 const getArticleResponse = (article: GetArticleREsponseInput) => {
   const { authorId, ...articleResponse } = article
   return {
-    article: {
-      ...articleResponse,
-      favorited: false,
-    },
+    article: articleResponse,
   }
 }
 
