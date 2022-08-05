@@ -46,7 +46,20 @@ export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) =
   }))
 }
 
-export const getArticlesFeedFromDB = getArticlesFromDB
+type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
+export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, userId }) => {
+  const articles = await db.getArticlesFeedFromDB({ filter, userId })
+
+  return articles.map(article => ({
+    ...article,
+    author: {
+      username: article.author.username,
+      bio: article.author.bio ?? '',
+      image: article.author.image ?? '',
+      following: false,
+    },
+  }))
+}
 
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
 export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {

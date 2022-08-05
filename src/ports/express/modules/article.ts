@@ -36,6 +36,19 @@ articleRoutes.get('/api/articles', tryAuth, (req: Request, res: Response) => {
   )()
 })
 
+articleRoutes.get('/api/articles/feed', auth, (req: Request, res: Response) => {
+  const payload = getPayload(req.auth)
+
+  pipe(
+    article.fetchArticlesFeed({
+      filter: req.query,
+      userId: payload.id,
+    }),
+    TE.map(result => res.json(result)),
+    TE.mapLeft(result => res.status(result.code).json(result.error)),
+  )()
+})
+
 articleRoutes.post('/api/articles/:slug/favorite', auth, (req: Request, res: Response) => {
   const payload = getPayload(req.auth)
   const slugProp = 'slug'
