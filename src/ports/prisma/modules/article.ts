@@ -4,7 +4,7 @@ import {
   AddCommentToAnArticleInDB,
 } from '@/ports/adapters/db/types'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
-import { ValidationError } from '@/helpers/errors'
+import { UnknownError, ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
@@ -174,8 +174,11 @@ export const favoriteArticleInDB = async (data: FavoriteArticleInput) => {
       createdAt: article.createdAt.toISOString(),
       updatedAt: article.updatedAt.toISOString(),
     }
-  } catch (e) {
-    const error = e as Error
+  } catch (error) {
+    if (!(error instanceof Error)) {
+      throw new UnknownError()
+    }
+
     if (error.message.includes('Unique constraint failed on the fields: (`userId`,`articleId`)')) {
       throw new ValidationError(`The article ${data.slug} is already a favorite`)
     }

@@ -8,7 +8,7 @@ import {
   FollowUser,
   UnfollowUser,
 } from '@/ports/adapters/db/types'
-import { ForbiddenError, NotFoundError, ValidationError } from '@/helpers/errors'
+import { ForbiddenError, NotFoundError, UnknownError, ValidationError } from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 export const createUserInDB: CreateUserInDB<User> = async (data) => {
@@ -51,8 +51,11 @@ export const updateUserInDB: UpdateUserInDB<User> = (id) => async (data) => {
     })
 
     return user
-  } catch (e) {
-    const error = e as Error
+  } catch (error) {
+    if (!(error instanceof Error)) {
+      throw new UnknownError()
+    }
+
     if (error.message.includes('constraint failed on the fields: (`email`)')) {
       throw new ValidationError('This email is already in use')
     }

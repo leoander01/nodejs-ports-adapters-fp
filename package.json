@@ -16,7 +16,8 @@
     "migrate": "prisma migrate dev --name",
     "migration": "prisma migrate dev",
     "migration:prod": "prisma migrate deploy",
-    "test": "jest --passWithNoTests && yarn test:integration",
+    "test": "yarn test:unit && yarn test:integration",
+    "test:unit": "jest",
     "test:watch": "jest --watch",
     "test:integration": "jest --passWithNoTests --config jest.config.integration.js",
     "test:integration:watch": " yarn test:integration --watch",
@@ -26,7 +27,8 @@
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "prepare": "husky install",
     "build": "tsc",
-    "ci": "yarn lint && yarn type-check && yarn test"
+    "ci": "yarn lint && yarn type-check && yarn test",
+    "update-deps": "sucrase-node ./src/config/update-deps.ts"
   },
   "dependencies": {
     "@prisma/client": "3.3.0",
