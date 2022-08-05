@@ -99,6 +99,66 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
   })
 }
 
+type GetArticlesFeedFromDBInput = {
+  filter?: ArticlesFilter
+  userId: string
+}
+export const getArticlesFeedFromDB = async ({ filter, userId }: GetArticlesFeedFromDBInput) => {
+  const following = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      following: {
+        select: {
+          followingId: true,
+        },
+      },
+    },
+  })
+
+  const articles = await prisma.article.findMany({
+    take: Number(filter?.limit ?? 20),
+    skip: Number(filter?.offset ?? 0),
+    orderBy: {
+      createdAt: 'desc',
+    },
+    where: {
+      author: {
+        id: {
+          in: following?.following.map(f => f.followingId),
+        },
+      },
+    },
+    include: {
+      author: true,
+      tagList: true,
+      favoritedArticles: {
+        where: {
+          userId,
+        },
+      },
+      _count: {
+        select: {
+          favoritedArticles: true,
+        },
+      },
+    },
+  })
+
+  return articles.map(article => {
+    const { _count, favoritedArticles, ...rest } = article
+    return {
+      ...rest,
+      favorited: article.favoritedArticles.length > 0,
+      favoritesCount: _count ? _count.favoritedArticles : 0,
+      tagList: article.tagList.map(({ name }) => name),
+      createdAt: article.createdAt.toISOString(),
+      updatedAt: article.updatedAt.toISOString(),
+    }
+  })
+}
+
 function authorFilter (author?: string) {
   return {
     author: {

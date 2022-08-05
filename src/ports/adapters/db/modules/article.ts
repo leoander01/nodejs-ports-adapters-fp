@@ -46,6 +46,8 @@ export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) =
   }))
 }
 
+export const getArticlesFeedFromDB = getArticlesFromDB
+
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>
 export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
   const article = await db.favoriteArticleInDB(data)
