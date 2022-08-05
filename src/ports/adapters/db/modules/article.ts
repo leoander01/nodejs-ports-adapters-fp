@@ -105,3 +105,5 @@ export const addCommentToAnArticleInDB: AddCommentToAnArticleInDB = async (data)
     },
   }
 }
+
+export const getTagsFomDB = db.getTagsFromDB
