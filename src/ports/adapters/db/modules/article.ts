@@ -41,7 +41,7 @@ export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) =
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }))
 }
@@ -56,7 +56,7 @@ export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, use
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: true,
     },
   }))
 }
@@ -70,7 +70,7 @@ export const favoriteArticleInDB: FavoriteArticleInDB = async (data) => {
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }
 }
@@ -83,7 +83,7 @@ export const unfavoriteArticleInDB: FavoriteArticleInDB = async (data) => {
       username: article.author.username,
       bio: article.author.bio ?? '',
       image: article.author.image ?? '',
-      following: false,
+      following: article.author.following,
     },
   }
 }
