@@ -85,6 +85,8 @@ export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) =
   }))
 }
 
+export const deleteArticleFromDB = db.deleteArticleFromDB
+
 type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
 export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, userId }) => {
   const articles = await db.getArticlesFeedFromDB({ filter, userId })
