@@ -5,9 +5,12 @@ import {
 } from '@/ports/adapters/db/types'
 import { TagOutput } from '@/core/tag/types'
 import { ArticlesFilter } from '@/ports/adapters/http/types'
-import { UnknownError, ValidationError } from '@/helpers/errors'
+import {
+  NotFoundError,
+  UnknownError,
+  ValidationError,
+} from '@/helpers/errors'
 import { prisma } from '../prisma'
-import { commentCodec } from '@/core/comment/types'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
   createdAt: string
@@ -51,6 +54,60 @@ export const createArticleInDB: CreateArticleInDB<ArticleReturned> = async (data
     }
   } catch (e) {
     throw new ValidationError(`The article "${data.title}" already exists`)
+  }
+}
+
+type FetchArticleInput = {
+  slug: string
+  userId: string
+}
+
+export const getArticleFromDB = async ({ slug, userId }: FetchArticleInput) => {
+  const singleArticle = await prisma.article.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      tagList: true,
+      author: {
+        include: {
+          whoIsFollowing: {
+            where: {
+              userId,
+            },
+          },
+        },
+      },
+      favoritedArticles: {
+        where: {
+          userId,
+        },
+      },
+      _count: {
+        select: {
+          favoritedArticles: true,
+        },
+      },
+    },
+  })
+
+  if (!singleArticle) {
+    throw new NotFoundError(`Article ${slug} does not exist`)
+  }
+
+  const { _count, favoritedArticles, ...article } = singleArticle
+
+  return {
+    ...article,
+    author: {
+      ...article.author,
+      following: !!article.author.whoIsFollowing.length,
+    },
+    favorited: favoritedArticles.length > 0,
+    favoritesCount: _count ? _count.favoritedArticles : 0,
+    tagList: article.tagList.map(tag => tag.name),
+    createdAt: article.createdAt.toISOString(),
+    updatedAt: article.createdAt.toISOString(),
   }
 }
 
