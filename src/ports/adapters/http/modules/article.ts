@@ -153,6 +153,22 @@ export function getCommentsFromAnArticle (data: GetCommentsFromAnArticleInput) {
   )
 }
 
+type DeleteCommentInput = {
+  slug: string
+  commentId: number
+  userId: string
+}
+
+export function deleteComment (data: DeleteCommentInput) {
+  return pipe(
+    TE.tryCatch(
+      () => db.deleteCommentFromDB(data),
+      E.toError,
+    ),
+    TE.mapLeft(getError),
+  )
+}
+
 export function getTags () {
   return pipe(
     TE.tryCatch(
