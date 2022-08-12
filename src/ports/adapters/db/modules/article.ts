@@ -70,36 +70,47 @@ type GetArticlesFromDBInput = {
   userId: string
 }
 
-type GetArticlesFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
-export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) => {
-  const articles = await db.getArticlesFromDB({ filter, userId })
+type ArticlesResponse = {
+  articles: DBArticle[]
+  articlesCount: number
+}
 
-  return articles.map(article => ({
-    ...article,
-    author: {
-      username: article.author.username,
-      bio: article.author.bio ?? '',
-      image: article.author.image ?? '',
-      following: article.author.following,
-    },
-  }))
+type GetArticlesFromDB = (input: GetArticlesFromDBInput) => Promise<ArticlesResponse>
+export const getArticlesFromDB: GetArticlesFromDB = async ({ filter, userId }) => {
+  const result = await db.getArticlesFromDB({ filter, userId })
+
+  return {
+    ...result,
+    articles: result.articles.map(article => ({
+      ...article,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio ?? '',
+        image: article.author.image ?? '',
+        following: article.author.following,
+      },
+    })),
+  }
 }
 
 export const deleteArticleFromDB = db.deleteArticleFromDB
 
-type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<DBArticle[]>
+type GetArticlesFeedFromDB = (input: GetArticlesFromDBInput) => Promise<ArticlesResponse>
 export const getArticlesFeedFromDB: GetArticlesFeedFromDB = async ({ filter, userId }) => {
-  const articles = await db.getArticlesFeedFromDB({ filter, userId })
+  const result = await db.getArticlesFeedFromDB({ filter, userId })
 
-  return articles.map(article => ({
-    ...article,
-    author: {
-      username: article.author.username,
-      bio: article.author.bio ?? '',
-      image: article.author.image ?? '',
-      following: true,
-    },
-  }))
+  return {
+    ...result,
+    articles: result.articles.map(article => ({
+      ...article,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio ?? '',
+        image: article.author.image ?? '',
+        following: true,
+      },
+    })),
+  }
 }
 
 type FavoriteArticleInDB = (data: FavoriteArticleInput) => Promise<DBArticle>

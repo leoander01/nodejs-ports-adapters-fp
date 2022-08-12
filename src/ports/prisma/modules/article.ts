@@ -193,18 +193,20 @@ type GetArticlesFromDBInput = {
   userId: string
 }
 export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInput) => {
-  const articles = await prisma.article.findMany({
+  const where = {
+    AND: [
+      authorFilter(filter?.author),
+      tagListFilter(filter?.tag),
+      favoritedFilter(filter?.favorited),
+    ],
+  }
+
+  const articlesQuery = prisma.article.findMany({
     take: Number(filter?.limit ?? 20),
     skip: Number(filter?.offset ?? 0),
+    where,
     orderBy: {
       createdAt: 'desc',
-    },
-    where: {
-      AND: [
-        authorFilter(filter?.author),
-        tagListFilter(filter?.tag),
-        favoritedFilter(filter?.favorited),
-      ],
     },
     include: {
       tagList: true,
@@ -230,21 +232,29 @@ export const getArticlesFromDB = async ({ filter, userId }: GetArticlesFromDBInp
     },
   })
 
-  return articles.map(article => {
-    const { _count, favoritedArticles, ...rest } = article
-    return {
-      ...rest,
-      author: {
-        ...rest.author,
-        following: !!rest.author.whoIsFollowing.length,
-      },
-      favorited: article.favoritedArticles.length > 0,
-      favoritesCount: _count ? _count.favoritedArticles : 0,
-      tagList: article.tagList.map(({ name }) => name),
-      createdAt: article.createdAt.toISOString(),
-      updatedAt: article.updatedAt.toISOString(),
-    }
-  })
+  const [articles, articlesCount] = await prisma.$transaction([
+    articlesQuery,
+    prisma.article.count({ where }),
+  ])
+
+  return {
+    articlesCount,
+    articles: articles.map(article => {
+      const { _count, favoritedArticles, ...rest } = article
+      return {
+        ...rest,
+        author: {
+          ...rest.author,
+          following: !!rest.author.whoIsFollowing.length,
+        },
+        favorited: article.favoritedArticles.length > 0,
+        favoritesCount: _count ? _count.favoritedArticles : 0,
+        tagList: article.tagList.map(({ name }) => name),
+        createdAt: article.createdAt.toISOString(),
+        updatedAt: article.updatedAt.toISOString(),
+      }
+    }),
+  }
 }
 
 type GetArticlesFeedFromDBInput = {
@@ -265,18 +275,20 @@ export const getArticlesFeedFromDB = async ({ filter, userId }: GetArticlesFeedF
     },
   })
 
-  const articles = await prisma.article.findMany({
+  const where = {
+    author: {
+      id: {
+        in: following?.following.map(f => f.followingId),
+      },
+    },
+  }
+
+  const articlesQuery = prisma.article.findMany({
     take: Number(filter?.limit ?? 20),
     skip: Number(filter?.offset ?? 0),
+    where,
     orderBy: {
       createdAt: 'desc',
-    },
-    where: {
-      author: {
-        id: {
-          in: following?.following.map(f => f.followingId),
-        },
-      },
     },
     include: {
       author: true,
@@ -294,17 +306,25 @@ export const getArticlesFeedFromDB = async ({ filter, userId }: GetArticlesFeedF
     },
   })
 
-  return articles.map(article => {
-    const { _count, favoritedArticles, ...rest } = article
-    return {
-      ...rest,
-      favorited: article.favoritedArticles.length > 0,
-      favoritesCount: _count ? _count.favoritedArticles : 0,
-      tagList: article.tagList.map(({ name }) => name),
-      createdAt: article.createdAt.toISOString(),
-      updatedAt: article.updatedAt.toISOString(),
-    }
-  })
+  const [articles, articlesCount] = await prisma.$transaction([
+    articlesQuery,
+    prisma.article.count({ where }),
+  ])
+
+  return {
+    articlesCount,
+    articles: articles.map(article => {
+      const { _count, favoritedArticles, ...rest } = article
+      return {
+        ...rest,
+        favorited: article.favoritedArticles.length > 0,
+        favoritesCount: _count ? _count.favoritedArticles : 0,
+        tagList: article.tagList.map(({ name }) => name),
+        createdAt: article.createdAt.toISOString(),
+        updatedAt: article.updatedAt.toISOString(),
+      }
+    }),
+  }
 }
 
 type DeleteArticleInput = {
