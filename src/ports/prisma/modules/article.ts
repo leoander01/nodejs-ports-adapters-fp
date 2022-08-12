@@ -13,7 +13,6 @@ import {
   ValidationError,
 } from '@/helpers/errors'
 import { prisma } from '../prisma'
-import { cp } from 'fs'
 
 type ArticleReturned = Omit<Article, 'createdAt' | 'updatedAt'> & {
   createdAt: string

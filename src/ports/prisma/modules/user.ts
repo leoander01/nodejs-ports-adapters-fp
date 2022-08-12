@@ -8,7 +8,12 @@ import {
   FollowUser,
   UnfollowUser,
 } from '@/ports/adapters/db/types'
-import { ForbiddenError, NotFoundError, UnknownError, ValidationError } from '@/helpers/errors'
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnknownError,
+  ValidationError,
+} from '@/helpers/errors'
 import { prisma } from '../prisma'
 
 export const createUserInDB: CreateUserInDB<User> = async (data) => {

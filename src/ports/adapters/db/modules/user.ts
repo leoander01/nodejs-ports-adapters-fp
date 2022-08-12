@@ -1,7 +1,7 @@
 import argon2 from 'argon2'
 import {
   CreateUser,
-  LoginUser,
+  LoginUserOutput,
   UpdateUser,
 } from '@/core/user/types'
 import { NotFoundError, ValidationError } from '@/helpers/errors'
@@ -10,11 +10,13 @@ import { DBUser } from '../types'
 
 type CreateUserInDB = (data: CreateUser) => Promise<DBUser>
 export const createUserInDB: CreateUserInDB = async (data) => {
+  const email = data.email.toLowerCase()
   const password = await argon2.hash(data.password)
 
   const newUser = await db.createUserInDB({
     ...data,
     password,
+    email,
   })
 
   return {
@@ -24,9 +26,10 @@ export const createUserInDB: CreateUserInDB = async (data) => {
   }
 }
 
-type Login = (data: LoginUser) => Promise<DBUser>
+type Login = (data: LoginUserOutput) => Promise<DBUser>
 export const login: Login = async (data) => {
-  const user = await db.login(data)
+  const email = data.email.toLowerCase()
+  const user = await db.login({ email, password: data.password })
 
   if (!user || !(await argon2.verify(user.password, data.password))) {
     throw new ValidationError('Invalid email or password')
@@ -39,12 +42,17 @@ export const login: Login = async (data) => {
 
 type UpdateUserInDB = (id: string) => (data: UpdateUser) => Promise<DBUser>
 export const updateUserInDB: UpdateUserInDB = (id) => async (data) => {
+  const email = data.email
+    ? data.email.toLowerCase()
+    : undefined
+
   const password = data.password
     ? (await argon2.hash(data.password))
     : undefined
 
   const updatedUser = await db.updateUserInDB(id)({
     ...data,
+    email,
     password,
   })
 

@@ -46,3 +46,4 @@ export const loginUserCodec = t.type({
 })
 
 export type LoginUser = t.TypeOf<typeof loginUserCodec>
+export type LoginUserOutput = t.OutputOf<typeof loginUserCodec>
