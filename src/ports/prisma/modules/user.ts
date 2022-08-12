@@ -134,8 +134,6 @@ export const followUser: FollowUser<User> = async ({ userToFollow, userId }) => 
     throw new ForbiddenError(`User ${userToFollow} does not exist`)
   }
 
-  console.log('profile:', profile)
-
   return {
     ...profile,
     following: transformFollower('followingId', profile.following),
